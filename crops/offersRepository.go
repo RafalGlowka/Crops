@@ -5,6 +5,7 @@ import (
 
 	"database/sql"
 
+	"encore.dev/beta/errs"
 	"encore.dev/rlog"
 	"encore.dev/storage/sqldb"
 )
@@ -113,5 +114,67 @@ func listOffersByOwner(ctx context.Context, ownerId int64) ([]Offer, error) {
 		offers = append(offers, o)
 	}
 	return offers, nil
+
+}
+
+func buyTransaction(ctx context.Context, offerId, buyerId int64) (bool, error) {
+	tx, err := sqldb.Begin(ctx)
+	if err != nil {
+		return false, err
+	}
+	defer tx.Rollback()
+
+	offerRow := tx.QueryRow(ctx, `
+		UPDATE offers 
+		SET buyerId = $1
+		WHERE id = $2 RETURNING price, sellerId;
+	`, buyerId, offerId)
+
+	var price int64
+	var sellerId int64
+	err = offerRow.Scan(&price, &sellerId)
+	if err != nil {
+		rlog.Error("getting offer data failed", "err", err)
+		return false, err
+	}
+	rlog.Error("price", "price", price)
+
+	balanceRow := tx.QueryRow(ctx, `
+		UPDATE users
+		SET balance = balance - $1
+		WHERE id = $2 RETURNING balance;
+	`, price, buyerId)
+
+	var balanceAfter int64
+	err = balanceRow.Scan(&balanceAfter)
+	if err != nil {
+		rlog.Error("update buyer balance failed", "err", err)
+		return false, err
+	}
+
+	if balanceAfter >= 0 {
+
+		_, err = tx.Exec(ctx, `
+			UPDATE users
+			SET balance = balance + $1
+			WHERE id = $2;
+		`, price, sellerId)
+		if err != nil {
+			rlog.Error("update seller balance failed", "err", err)
+			return false, err
+		}
+
+		err = tx.Commit()
+		if err != nil {
+			rlog.Error("commit failed", "err", err)
+			return false, err
+		}
+		return true, nil
+	} else {
+		return false, &errs.Error{
+			Code:    errs.PermissionDenied,
+			Message: "Not enought balance !",
+		}
+	}
 
 }

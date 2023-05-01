@@ -1,0 +1,341 @@
+{
+	"info": {
+		"_postman_id": "22b9fcac-2792-4caf-a38e-c28382943887",
+		"name": "Crops",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21515325"
+	},
+	"item": [
+		{
+			"name": "Create User",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"user-agent": true,
+					"connection": true,
+					"accept-encoding": true,
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"Email\": \"test2@test.test\",\r\n\"Password\": \"12345\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/user/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"user",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login User",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"Email\": \"test@test.test\",\r\n\"Password\": \"12345\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/user/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"user",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TopUpUser",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer wB7FT5DWPJQfccjnxK8CC53dD5fK-iJp9UDQ4lipPwM=",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"Amount\": 10000000\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/user/topUp",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"user",
+						"topUp"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getFields",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer Jxd791pyniqF1KShrZpbhtTDrlgz68BN6DDnIVy46Tk=",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:4000/fields",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"fields"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "addField",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer m0JqLGaqcTtXo8uCLHR6pZRl6mw0HLnDpQmIiYaCGbA=",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"RegistrationNumber\": \"ABCD1234567890\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/fields/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"fields",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "addOffer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer nT1_M7ApvjJU7SXYdh1TUNdsb4DV555tveWMiLh6b08=",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"FieldId\": 1,\r\n\t\"Year\": 2023,\r\n\t\"Price\": 4000000,\r\n\t\"CropType\": 2,\r\n\t\"Status\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/offers/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"offers",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "buyOffer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer CyL5BbNAxPWA1f5Ut4S1gRuwl1s_02_0Xh0NcPnDH2M=",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"OfferId\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/offers/buy",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"offers",
+						"buy"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "harvestOffer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 880EIdQd_tJ_wO6PMfLONabJzwxZkP1eJQyn9WjtP1U=",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"OfferId\": 1,\r\n    \"HarvestSize\": 2000\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/offers/harvest",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"offers",
+						"harvest"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "crop Add",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer m0JqLGaqcTtXo8uCLHR6pZRl6mw0HLnDpQmIiYaCGbA=",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Name\": \"Owies\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:4000/crops/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"crops",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "fieldsHistory",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer 880EIdQd_tJ_wO6PMfLONabJzwxZkP1eJQyn9WjtP1U=",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"FieldId\" : 1\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:4000/fields/history",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"fields",
+						"history"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

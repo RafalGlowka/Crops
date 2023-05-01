@@ -106,6 +106,63 @@ func addField(ctx context.Context, params *AddFieldParam) (*FieldResponse, error
 
 }
 
+type VerifyFieldParam struct {
+	FieldId uint64
+}
+
+//encore:api auth method=POST path=/fields/verify
+func verifyField(ctx context.Context, params *VerifyFieldParam) (*FieldResponse, error) {
+	uid, authenticated := auth.UserID()
+	sessionData := auth.Data().(*SessionData)
+
+	if len(uid) < 1 || authenticated != true || sessionData == nil || sessionData.UserId == 0 {
+		rlog.Error("not authenticated", "authenticatedFlag", authenticated)
+		return nil, &errs.Error{
+			Code:    errs.PermissionDenied,
+			Message: "Permission denied",
+		}
+	}
+
+	userId := sessionData.UserId
+	user, err := getUserById(ctx, userId)
+	if err != nil || user.isVerifier == false {
+		rlog.Error("cannot place in DB", "err", err)
+		var message = ""
+		if err != nil {
+			message = "Missing permissions"
+		} else {
+			message = err.Error()
+		}
+		return nil, &errs.Error{
+			Code:    errs.PermissionDenied,
+			Message: message,
+		}
+	}
+
+	field, err := fieldById(ctx, params.FieldId)
+	if err != nil {
+		rlog.Error("cannot find field in DB", "err", err)
+		return nil, &errs.Error{
+			Code:    errs.InvalidArgument,
+			Message: err.Error(),
+		}
+	}
+
+	field.isVerified = true
+
+	insertedField, err := updateField(ctx, *field)
+	if err != nil {
+		rlog.Error("cannot place in DB", "err", err)
+		return nil, &errs.Error{
+			Code:    errs.Aborted,
+			Message: err.Error(),
+		}
+	}
+
+	return &FieldResponse{Item: *insertedField}, nil
+
+}
+
 type AddCropTypeParam struct {
 	Name string
 }
@@ -127,6 +184,22 @@ func addCropType(ctx context.Context, params *AddCropTypeParam) (*CropTypeRespon
 		}
 	}
 
+	userId := sessionData.UserId
+	user, err := getUserById(ctx, userId)
+	if err != nil || user.isVerifier == false {
+		rlog.Error("cannot place in DB", "err", err)
+		var message = ""
+		if err != nil {
+			message = "Missing permissions"
+		} else {
+			message = err.Error()
+		}
+		return nil, &errs.Error{
+			Code:    errs.PermissionDenied,
+			Message: message,
+		}
+	}
+
 	registrationNumberValidationResult := createRegistrationNumberValidator().validate(params.Name)
 	if registrationNumberValidationResult != nil {
 		return nil, &errs.Error{
@@ -145,5 +218,39 @@ func addCropType(ctx context.Context, params *AddCropTypeParam) (*CropTypeRespon
 	}
 
 	return &CropTypeResponse{Item: *insertedCropType}, nil
+
+}
+
+type FieldHistoryParam struct {
+	FieldId uint64
+}
+
+type FieldHistoryResponse struct {
+	Items []Harvest
+}
+
+//encore:api auth method=POST path=/fields/history
+func fieldHistory(ctx context.Context, params *FieldHistoryParam) (*FieldHistoryResponse, error) {
+	uid, authenticated := auth.UserID()
+	sessionData := auth.Data().(*SessionData)
+
+	if len(uid) < 1 || authenticated != true || sessionData == nil || sessionData.UserId == 0 {
+		rlog.Error("not authenticated", "authenticatedFlag", authenticated)
+		return nil, &errs.Error{
+			Code:    errs.PermissionDenied,
+			Message: "Permission denied",
+		}
+	}
+
+	harvests, err := listHarvest(ctx)
+	if err != nil {
+		rlog.Error("gettingHarvest error!", "err", err)
+		return nil, &errs.Error{
+			Code:    errs.Aborted,
+			Message: err.Error(),
+		}
+	}
+	fieldsResponse := FieldHistoryResponse{Items: harvests}
+	return &fieldsResponse, nil
 
 }

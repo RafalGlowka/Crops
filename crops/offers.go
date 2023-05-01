@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"database/sql"
-
 	"encore.dev/beta/auth"
 	"encore.dev/beta/errs"
 	"encore.dev/rlog"
@@ -99,6 +97,14 @@ func addOffer(ctx context.Context, params *AddOfferParam) (*OfferResponse, error
 		}
 	}
 
+	if field.isVerified == false {
+		rlog.Error("field not verified", "err", err)
+		return nil, &errs.Error{
+			Code:    errs.Aborted,
+			Message: "Field need to verified first",
+		}
+	}
+
 	userId := sessionData.UserId
 	if field.ownerId != userId {
 		return nil, &errs.Error{
@@ -163,11 +169,14 @@ func buyOffer(ctx context.Context, params *BuyOfferParam) (*OfferResponse, error
 		}
 	}
 
-	offer.BuyerId = sql.NullInt64{Int64: int64(userId), Valid: true}
-
-	updatedOffer, err := updateOffer(ctx, *offer)
+	_, err = buyTransaction(ctx, params.OfferId, userId)
 	if err != nil {
-		rlog.Error("cannot update in DB", "err", err)
+		return nil, err
+	}
+
+	updatedOffer, err := offerById(ctx, params.OfferId)
+	if err != nil {
+		rlog.Error("cannot get updated offer in DB", "err", err)
 		return nil, &errs.Error{
 			Code:    errs.Aborted,
 			Message: err.Error(),
